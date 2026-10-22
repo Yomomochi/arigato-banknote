@@ -229,9 +229,9 @@ saveButton.addEventListener("click", async function () {
     link.href = dataUrl;
     link.click();
 
- } catch (error) {
-  console.error("画像の保存に失敗しました:", error);
-  alert("エラー内容：" + error.message);
+} catch (error) {
+  console.error("保存エラーの詳細:", error);
+  alert("保存エラーの詳細は、開発者ツールのConsoleを確認してね。");
 
   } finally {
     saveButton.disabled = false;
