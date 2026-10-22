@@ -52,29 +52,36 @@
         transparent 100%
       );
     }
-    #messageText {
+    
+#messageText {
   position: absolute;
+
+  /* 文字枠の位置と大きさ */
   left: 8%;
   top: 25%;
   width: 48%;
   height: 55%;
-  box-sizing: border-box;
 
+  box-sizing: border-box;
+  padding: 3%;
+
+  /* 文字を枠の中央に配置 */
   display: flex;
   align-items: center;
   justify-content: center;
 
-  padding: 4%;
+  /* 枠からはみ出さないようにする */
   overflow: hidden;
-  white-space: pre-wrap;
   overflow-wrap: anywhere;
+  white-space: pre-wrap;
   text-align: center;
 
   color: #58353b;
   font-family: serif;
   font-size: 18px;
-  line-height: 1.3;
+  line-height: 1.2;
 }
+
   </style>
 </head>
 
