@@ -52,6 +52,29 @@
         transparent 100%
       );
     }
+    #messageText {
+  position: absolute;
+  left: 8%;
+  top: 25%;
+  width: 48%;
+  height: 55%;
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 4%;
+  overflow: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  text-align: center;
+
+  color: #58353b;
+  font-family: serif;
+  font-size: clamp(8px, 2vw, 18px);
+  line-height: 1.5;
+}
   </style>
 </head>
 
@@ -67,13 +90,22 @@
     >
     <img id="portrait" alt="">
     <img id="portraitProcessed" alt="版画風の肖像写真">
+    <div id="messageText"></div>
   </div>
 
   <p>
     <label for="photo">肖像写真を選ぶ：</label>
     <input id="photo" type="file" accept="image/*">
   </p>
-
+<p>
+  <label for="messageInput">紙幣に入れるメッセージ：</label><br>
+  <textarea
+    id="messageInput"
+    rows="4"
+    maxlength="120"
+    placeholder="ここにありがとうのメッセージを入力！"
+  ></textarea>
+</p>
   <script>
     const photoInput = document.getElementById("photo");
     const portrait = document.getElementById("portrait");
@@ -146,6 +178,12 @@
 
       portrait.src = originalImageURL;
     });
+    const messageInput = document.getElementById("messageInput");
+const messageText = document.getElementById("messageText");
+
+messageInput.addEventListener("input", function () {
+  messageText.textContent = messageInput.value;
+});
   </script>
 </body>
 </html>
