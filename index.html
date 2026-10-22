@@ -230,14 +230,13 @@ saveButton.addEventListener("click", async function () {
     link.click();
 
 } catch (error) {
-  console.error("保存エラーの詳細:", error);
+  console.error("保存エラー:", error);
 
-  const details =
-    error && error.message
-      ? error.message
-      : String(error);
-
-  alert("保存エラーの詳細：" + details);
+  if (error instanceof Error) {
+    alert("保存エラー：" + error.name + "\n" + error.message);
+  } else {
+    alert("保存エラーの種類：" + Object.prototype.toString.call(error));
+  }
 
 } finally {
   saveButton.disabled = false;
