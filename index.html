@@ -219,10 +219,15 @@ saveButton.addEventListener("click", async function () {
     saveButton.disabled = true;
     saveButton.textContent = "画像を作成中…";
 
-    const dataUrl = await htmlToImage.toPng(banknote, {
-      pixelRatio: 2,
-      cacheBust: true
-    });
+    
+const dataUrl = await htmlToImage.toPng(banknote, {
+  pixelRatio: 2,
+  cacheBust: true,
+  filter: function (node) {
+    return node.id !== "portrait";
+  }
+});
+
 
     const link = document.createElement("a");
     link.download = "ありがとう紙幣.png";
