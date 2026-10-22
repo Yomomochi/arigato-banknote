@@ -209,7 +209,37 @@ function fitMessageText() {
 
 messageInput.addEventListener("input", fitMessageText);
 window.addEventListener("resize", fitMessageText);
-</script>
+    
+const saveButton = document.getElementById("saveButton");
 
+saveButton.addEventListener("click", async function () {
+  const banknote = document.querySelector(".banknote");
+
+  try {
+    saveButton.disabled = true;
+    saveButton.textContent = "画像を作成中…";
+
+    const dataUrl = await htmlToImage.toPng(banknote, {
+      pixelRatio: 2,
+      cacheBust: true
+    });
+
+    const link = document.createElement("a");
+    link.download = "ありがとう紙幣.png";
+    link.href = dataUrl;
+    link.click();
+
+  } catch (error) {
+    console.error("画像の保存に失敗しました:", error);
+    alert("保存できませんでした。ページを再読み込みして、もう一度試してね。");
+
+  } finally {
+    saveButton.disabled = false;
+    saveButton.textContent = "ありがとう紙幣を保存する";
+  }
+});
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.13/dist/html-to-image.min.js"></script>
 </body>
 </html>
