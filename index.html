@@ -229,14 +229,18 @@ saveButton.addEventListener("click", async function () {
     link.href = dataUrl;
     link.click();
 
-} catch (error) {
-  console.error("保存エラー:", error);
 
-  if (error instanceof Error) {
-    alert("保存エラー：" + error.name + "\n" + error.message);
-  } else {
-    alert("保存エラーの種類：" + Object.prototype.toString.call(error));
-  }
+} catch (error) {
+  console.error("保存エラーの詳細:", error);
+
+  alert(
+    "保存エラー\n" +
+    "種類: " + (error?.constructor?.name ?? "不明") + "\n" +
+    "内容: " + (error?.message ?? "メッセージなし") + "\n" +
+    "イベント種類: " + (error?.type ?? "なし") + "\n" +
+    "対象: " + (error?.target?.tagName ?? "なし") +
+    (error?.target?.id ? "#" + error.target.id : "")
+  );
 
 } finally {
   saveButton.disabled = false;
