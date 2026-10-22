@@ -84,7 +84,49 @@ mask-image: radial-gradient(
     };
 
     portrait.src = imageURL;
-  });
+  });const portraitCanvas = document.getElementById("portraitCanvas");
+const ctx = portraitCanvas.getContext("2d");
+
+function makeEngraving() {
+  const w = portrait.naturalWidth;
+  const h = portrait.naturalHeight;
+
+  if (!w || !h) return;
+
+  portraitCanvas.width = w;
+  portraitCanvas.height = h;
+
+  ctx.drawImage(portrait, 0, 0, w, h);
+
+  const imageData = ctx.getImageData(0, 0, w, h);
+  const pixels = imageData.data;
+
+  // 紙幣になじむ、くすんだローズブラウン
+  const ink = { r: 143, g: 98, b: 104 };
+
+  for (let i = 0; i < pixels.length; i += 4) {
+    const brightness =
+      (pixels[i] * 0.299 +
+       pixels[i + 1] * 0.587 +
+       pixels[i + 2] * 0.114) / 255;
+
+    // 明るい部分は紙色、暗い部分はインク色にする
+    const tone = Math.max(
+      0,
+      Math.min(1, (brightness - 0.12) / 0.88)
+    );
+
+    pixels[i] = ink.r + (245 - ink.r) * tone;
+    pixels[i + 1] = ink.g + (235 - ink.g) * tone;
+    pixels[i + 2] = ink.b + (220 - ink.b) * tone;
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+
+  portrait.src = portraitCanvas.toDataURL("image/png");
+}
+
+portrait.addEventListener("load", makeEngraving);
 </script>
 
 </body>
