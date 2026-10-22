@@ -106,81 +106,83 @@
     placeholder="ここにありがとうのメッセージを入力！"
   ></textarea>
 </p>
-  <script>
-    const photoInput = document.getElementById("photo");
-    const portrait = document.getElementById("portrait");
-    const portraitProcessed =
-      document.getElementById("portraitProcessed");
+ 
+<script>
+const photoInput = document.getElementById("photo");
+const portrait = document.getElementById("portrait");
+const portraitProcessed =
+  document.getElementById("portraitProcessed");
 
-    let originalImageURL = null;
-
-    photoInput.addEventListener("change", function () {
-      const file = photoInput.files[0];
-      if (!file) return;
-
-      if (originalImageURL) {
-        URL.revokeObjectURL(originalImageURL);
-      }
-
-      originalImageURL = URL.createObjectURL(file);
-
-      portrait.onload = function () {
-        try {
-          const canvas = document.createElement("canvas");
-          const ctx = canvas.getContext("2d");
-
-          canvas.width = portrait.naturalWidth;
-          canvas.height = portrait.naturalHeight;
-
-          ctx.drawImage(portrait, 0, 0);
-
-          const imageData = ctx.getImageData(
-            0, 0, canvas.width, canvas.height
-          );
-          const pixels = imageData.data;
-
-          // 紙幣になじむローズブラウンと生成り色
-          const ink = { r: 88, g: 53, b: 59 };
-          const paper = { r: 218, g: 192, b: 187 };
-
-          for (let i = 0; i < pixels.length; i += 4) {
-            const brightness =
-              (pixels[i] * 0.299 +
-               pixels[i + 1] * 0.587 +
-               pixels[i + 2] * 0.114) / 255;
-
-            const tone = Math.max(
-              0,
-              Math.min(1, (brightness - 0.15) / 0.75)
-            );
-
-            pixels[i] =
-              ink.r * (1 - tone) + paper.r * tone;
-            pixels[i + 1] =
-              ink.g * (1 - tone) + paper.g * tone;
-            pixels[i + 2] =
-              ink.b * (1 - tone) + paper.b * tone;
-          }
-
-          ctx.putImageData(imageData, 0, 0);
-
-          // 元画像ではなく、加工結果を別画像に表示
-          portraitProcessed.onload = function () {
-            portraitProcessed.style.display = "block";
-          };
-          portraitProcessed.src = canvas.toDataURL("image/png");
-
-        } catch (error) {
-          console.error("肖像の加工に失敗しました:", error);
-          alert("写真を加工できませんでした。別の画像でも試してみてね。");
-        }
-      };
-
-      portrait.src = originalImageURL;
-    });
-    const messageInput = document.getElementById("messageInput");
+const messageInput = document.getElementById("messageInput");
 const messageText = document.getElementById("messageText");
 
+let originalImageURL = null;
+
+// 写真を選んだときの処理
+photoInput.addEventListener("change", function () {
+  const file = photoInput.files[0];
+  if (!file) return;
+
+  if (originalImageURL) {
+    URL.revokeObjectURL(originalImageURL);
+  }
+
+  originalImageURL = URL.createObjectURL(file);
+
+  portrait.onload = function () {
+    try {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
+      canvas.width = portrait.naturalWidth;
+      canvas.height = portrait.naturalHeight;
+
+      ctx.drawImage(portrait, 0, 0);
+
+      const imageData = ctx.getImageData(
+        0, 0, canvas.width, canvas.height
+      );
+      const pixels = imageData.data;
+
+      const ink = { r: 88, g: 53, b: 59 };
+      const paper = { r: 218, g: 192, b: 187 };
+
+      for (let i = 0; i < pixels.length; i += 4) {
+        const brightness =
+          (pixels[i] * 0.299 +
+           pixels[i + 1] * 0.587 +
+           pixels[i + 2] * 0.114) / 255;
+
+        const tone = Math.max(
+          0,
+          Math.min(1, (brightness - 0.15) / 0.75)
+        );
+
+        pixels[i] = ink.r * (1 - tone) + paper.r * tone;
+        pixels[i + 1] =
+          ink.g * (1 - tone) + paper.g * tone;
+        pixels[i + 2] =
+          ink.b * (1 - tone) + paper.b * tone;
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+
+      portraitProcessed.onload = function () {
+        portraitProcessed.style.display = "block";
+      };
+
+      portraitProcessed.src = canvas.toDataURL("image/png");
+
+    } catch (error) {
+      console.error(error);
+      alert("写真の加工に失敗しました。");
+    }
+  };
+
+  portrait.src = originalImageURL;
+});
+
+// 文章が枠に収まるように調整
 function fitMessageText() {
   messageText.textContent = messageInput.value;
 
@@ -199,7 +201,6 @@ function fitMessageText() {
 
 messageInput.addEventListener("input", fitMessageText);
 window.addEventListener("resize", fitMessageText);
-});
-  </script>
+</script>
 </body>
 </html>
