@@ -1,169 +1,151 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ありがとうのインフレーション</title>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 16px;
+    }
+
+    .banknote {
+      position: relative;
+      width: 100%;
+      max-width: 700px;
+    }
+
+    #template {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    /* 元画像は読み込み用。画面には表示しない */
+    #portrait {
+      display: none;
+    }
+
+    /* 加工した肖像だけを紙幣に重ねる */
+    #portraitProcessed {
+      display: none;
+      position: absolute;
+      left: 68%;
+      top: 29%;
+      width: 22%;
+      height: 50%;
+      object-fit: cover;
+      object-position: center;
+      border-radius: 50%;
+
+      -webkit-mask-image: radial-gradient(
+        ellipse at center,
+        black 72%,
+        transparent 100%
+      );
+      mask-image: radial-gradient(
+        ellipse at center,
+        black 72%,
+        transparent 100%
+      );
+    }
+  </style>
 </head>
+
 <body>
-  
-<h1>ありがとう紙幣ジェネレーター</h1>
-<p>写真を選ぶと、紙幣の肖像に表示されます。</p>
+  <h1>ありがとう紙幣ジェネレーター</h1>
+  <p>写真を選ぶと、紙幣の肖像に表示されます。</p>
 
-<div class="banknote">
-  <img
-    id="template"
-    src="【表】ありがとう新紙幣.PNG"
-    alt="紙幣のテンプレート"
-  >
-  <img id="portrait" alt="モノクロの肖像写真">
-  <img id="portraitProcessed" alt="版画風の肖像写真">
-</div>
+  <div class="banknote">
+    <img
+      id="template"
+      src="【表】ありがとう新紙幣.PNG"
+      alt="紙幣のテンプレート"
+    >
+    <img id="portrait" alt="">
+    <img id="portraitProcessed" alt="版画風の肖像写真">
+  </div>
 
-<p>
-  <label for="photo">肖像写真を選ぶ：</label>
-  <input id="photo" type="file" accept="image/*">
-</p>
+  <p>
+    <label for="photo">肖像写真を選ぶ：</label>
+    <input id="photo" type="file" accept="image/*">
+  </p>
 
-<style>
-  .banknote {
-    position: relative;
-    width: 100%;
-    max-width: 700px;
-  }
+  <script>
+    const photoInput = document.getElementById("photo");
+    const portrait = document.getElementById("portrait");
+    const portraitProcessed =
+      document.getElementById("portraitProcessed");
 
-  #template {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
+    let originalImageURL = null;
 
-  #portrait {
-  display: none;
-  position: absolute;
+    photoInput.addEventListener("change", function () {
+      const file = photoInput.files[0];
+      if (!file) return;
 
-  left: 68%;
-  top: 29%;
-  width: 22%;
-  height: 50%;
+      if (originalImageURL) {
+        URL.revokeObjectURL(originalImageURL);
+      }
 
-  object-fit: cover;
-  object-position: center;
-  filter: grayscale(100%);
-  border-radius: 50%;
-    
-object-fit: cover;
-object-position: center;
-filter: grayscale(100%) sepia(100%) hue-rotate(285deg) saturate(45%) contrast(125%) brightness(90%);
-border-radius: 50%;
--webkit-mask-image: radial-gradient(
-  ellipse at center,
-  black 72%,
-  transparent 100%
-);
-mask-image: radial-gradient(
-  ellipse at center,
-  black 72%,
-  transparent 100%
-  #portraitProcessed {
-  display: none;
-  position: absolute;
-  left: 67%;
-  top: 27%;
-  width: 22%;
-  height: 51%;
-  object-fit: cover;
-  object-position: center;
-  border-radius: 50%;
+      originalImageURL = URL.createObjectURL(file);
 
-  -webkit-mask-image: radial-gradient(
-    ellipse at center,
-    black 72%,
-    transparent 100%
-  );
-  mask-image: radial-gradient(
-    ellipse at center,
-    black 72%,
-    transparent 100%
-  );
-}
-  mask-image: radial-gradient(
-    ellipse at center,
-    black 72%,
-    transparent 100%
-  );
-}
-);
-}
-</style>
+      portrait.onload = function () {
+        try {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
 
-<script>
-const photoInput = document.getElementById("photo");
-const portrait = document.getElementById("portrait");
+          canvas.width = portrait.naturalWidth;
+          canvas.height = portrait.naturalHeight;
 
-let originalImageURL = null;
+          ctx.drawImage(portrait, 0, 0);
 
-photoInput.addEventListener("change", function () {
-  const file = photoInput.files[0];
-  if (!file) return;
+          const imageData = ctx.getImageData(
+            0, 0, canvas.width, canvas.height
+          );
+          const pixels = imageData.data;
 
-  if (originalImageURL) {
-    URL.revokeObjectURL(originalImageURL);
-  }
+          // 紙幣になじむローズブラウンと生成り色
+          const ink = { r: 143, g: 98, b: 104 };
+          const paper = { r: 232, g: 210, b: 190 };
 
-  originalImageURL = URL.createObjectURL(file);
+          for (let i = 0; i < pixels.length; i += 4) {
+            const brightness =
+              (pixels[i] * 0.299 +
+               pixels[i + 1] * 0.587 +
+               pixels[i + 2] * 0.114) / 255;
 
-  portrait.onload = function () {
-    portrait.style.display = "block";
-  };
+            const tone = Math.max(
+              0,
+              Math.min(1, (brightness - 0.15) / 0.75)
+            );
 
-  portrait.src = originalImageURL;
-});
-　const portraitProcessed = document.getElementById("portraitProcessed");
+            pixels[i] =
+              ink.r * (1 - tone) + paper.r * tone;
+            pixels[i + 1] =
+              ink.g * (1 - tone) + paper.g * tone;
+            pixels[i + 2] =
+              ink.b * (1 - tone) + paper.b * tone;
+          }
 
-portrait.addEventListener("load", function () {
-  if (!portrait.naturalWidth) return;
+          ctx.putImageData(imageData, 0, 0);
 
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
+          // 元画像ではなく、加工結果を別画像に表示
+          portraitProcessed.onload = function () {
+            portraitProcessed.style.display = "block";
+          };
+          portraitProcessed.src = canvas.toDataURL("image/png");
 
-  canvas.width = portrait.naturalWidth;
-  canvas.height = portrait.naturalHeight;
+        } catch (error) {
+          console.error("肖像の加工に失敗しました:", error);
+          alert("写真を加工できませんでした。別の画像でも試してみてね。");
+        }
+      };
 
-  ctx.drawImage(portrait, 0, 0);
-
-  const imageData = ctx.getImageData(
-    0, 0, canvas.width, canvas.height
-  );
-  const pixels = imageData.data;
-
-  // 紙幣になじむ、くすんだローズブラウン
-  const ink = { r: 143, g: 98, b: 104 };
-  const paper = { r: 232, g: 210, b: 190 };
-
-  for (let i = 0; i < pixels.length; i += 4) {
-    const brightness =
-      (pixels[i] * 0.299 +
-       pixels[i + 1] * 0.587 +
-       pixels[i + 2] * 0.114) / 255;
-
-    // 明暗を少し強めて、印刷っぽくする
-    const tone = Math.max(
-      0,
-      Math.min(1, (brightness - 0.15) / 0.75)
-    );
-
-    pixels[i] = ink.r * (1 - tone) + paper.r * tone;
-    pixels[i + 1] = ink.g * (1 - tone) + paper.g * tone;
-    pixels[i + 2] = ink.b * (1 - tone) + paper.b * tone;
-  }
-
-  ctx.putImageData(imageData, 0, 0);
-
-  // 加工結果だけを別画像に表示
-  portraitProcessed.src = canvas.toDataURL("image/png");
-  portraitProcessed.style.display = "block";
-});
-</script>
-
+      portrait.src = originalImageURL;
+    });
+  </script>
 </body>
 </html>
