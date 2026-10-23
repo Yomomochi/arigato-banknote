@@ -84,6 +84,7 @@
 
   </style>
   <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.13/dist/html-to-image.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
   <h1>ありがとう紙幣ジェネレーター</h1>
@@ -307,24 +308,32 @@ saveButton.addEventListener("click", async function () {
     }
 
     if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
-      const preview = document.getElementById("savePreview");
-      preview.src = dataUrl;
-      document.getElementById("saveHelp").style.display = "block";
-      preview.style.display = "block";
-    } else {
-      const link = document.createElement("a");
-      link.download = "ありがとう紙幣.png";
-      link.href = dataUrl;
-      link.click();
+  const canvas = await html2canvas(banknote, {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: null
+  });
+
+  const dataUrl = canvas.toDataURL("image/png");
+  const preview = document.getElementById("savePreview");
+
+  preview.src = dataUrl;
+  preview.style.display = "block";
+  document.getElementById("saveHelp").style.display = "block";
+} else {
+  const dataUrl = await htmlToImage.toPng(banknote, {
+    pixelRatio: 2,
+    cacheBust: true,
+    filter: function (node) {
+      return node.id !== "portrait";
     }
-  } catch (error) {
-    console.error("保存エラーの詳細:", error);
-    alert("画像の作成に失敗しました: " + (error.message || error));
-  } finally {
-    saveButton.disabled = false;
-    saveButton.textContent = "ありがとう紙幣を保存する";
-  }
-});
+  });
+
+  const link = document.createElement("a");
+  link.download = "ありがとう紙幣.png";
+  link.href = dataUrl;
+  link.click();
+}
 
 </script>
 </body>
