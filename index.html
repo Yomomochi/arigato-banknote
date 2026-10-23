@@ -101,6 +101,13 @@
   </div>
   <button id="saveButton">ありがとう紙幣を保存する</button>
 
+<div id="saveHelp" style="display:none; margin-top:16px;">
+  <p>画像を長押しして保存するか、共有メニューから保存してください。</p>
+  <img id="savePreview"
+       alt="保存するありがとう紙幣"
+       style="display:block; max-width:100%; height:auto;">
+</div>
+
   <p>
     <label for="photo">肖像写真を選ぶ：</label>
     <input id="photo" type="file" accept="image/*">
@@ -230,10 +237,17 @@ const dataUrl = await htmlToImage.toPng(banknote, {
 
 
     
-const link = document.createElement("a");
-link.download = "ありがとう紙幣.png";
-link.href = dataUrl;
-link.click();
+
+if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+  const preview = document.getElementById("savePreview");
+  preview.src = dataUrl;
+  document.getElementById("saveHelp").style.display = "block";
+} else {
+  const link = document.createElement("a");
+  link.download = "ありがとう紙幣.png";
+  link.href = dataUrl;
+  link.click();
+}
 
 
 } catch (error) {
