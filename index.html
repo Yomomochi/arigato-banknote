@@ -241,6 +241,7 @@ const dataUrl = await htmlToImage.toPng(banknote, {
 if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
   const preview = document.getElementById("savePreview");
   preview.src = dataUrl;
+  preview.style.display = "block";
   document.getElementById("saveHelp").style.display = "block";
 } else {
   const link = document.createElement("a");
