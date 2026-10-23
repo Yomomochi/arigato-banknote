@@ -222,15 +222,12 @@ const saveButton = document.getElementById("saveButton");
 saveButton.addEventListener("click", async function () {
   const banknote = document.querySelector(".banknote");
 
+  alert(document.getElementById("template").naturalHeight);
+  
   try {
     saveButton.disabled = true;
     saveButton.textContent = "画像を作成中…";
 
-   alert(
-  "画像読み込み確認\n" +
-  "complete: " + document.getElementById("template").complete + "\n" +
-  "naturalWidth: " + document.getElementById("template").naturalWidth
-);
     
 const dataUrl = await htmlToImage.toPng(banknote, {
   pixelRatio: 2,
