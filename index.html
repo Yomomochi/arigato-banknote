@@ -222,8 +222,6 @@ const saveButton = document.getElementById("saveButton");
 saveButton.addEventListener("click", async function () {
   const banknote = document.querySelector(".banknote");
 
-  alert(document.getElementById("template").naturalHeight);
-  
   try {
     saveButton.disabled = true;
     saveButton.textContent = "画像を作成中…";
