@@ -230,19 +230,10 @@ const dataUrl = await htmlToImage.toPng(banknote, {
 
 
     
-if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
-  const preview = document.getElementById("savePreview");
-  preview.src = dataUrl;
-  preview.style.display = "block";
-
-  document.getElementById("saveHelp").style.display = "block";
-} else {
-  const link = document.createElement("a");
-  link.download = "ありがとう紙幣.png";
-  link.href = dataUrl;
-  link.click();
-}
-
+const link = document.createElement("a");
+link.download = "ありがとう紙幣.png";
+link.href = dataUrl;
+link.click();
 
 
 } catch (error) {
@@ -261,12 +252,6 @@ if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
   saveButton.disabled = false;
   saveButton.textContent = "ありがとう紙幣を保存する";
     
-<div id="saveHelp" style="display:none; margin-top:16px;">
-  <p>画像を長押しして保存するか、共有メニューから保存してください。</p>
-  <img id="savePreview"
-       alt="保存するありがとう紙幣"
-       style="display:none; max-width:100%; height:auto;">
-</div>
 
 }
 });
