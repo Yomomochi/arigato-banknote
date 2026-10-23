@@ -84,6 +84,7 @@
 
   </style>
   <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.13/dist/html-to-image.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
   <h1>ありがとう紙幣ジェネレーター</h1>
@@ -233,69 +234,15 @@ saveButton.addEventListener("click", async function () {
     let dataUrl;
 
     if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
-      await template.decode();
+  await document.fonts.ready;
 
-      const rect = banknote.getBoundingClientRect();
-      const scale = template.naturalWidth / rect.width;
+  const canvas = await html2canvas(banknote, {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: null
+  });
 
-      const canvas = document.createElement("canvas");
-      canvas.width = template.naturalWidth;
-      canvas.height = template.naturalHeight;
-
-      const ctx = canvas.getContext("2d");
-
-      ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
-
-      const portraitStyle = getComputedStyle(portraitProcessed);
-
-      if (
-        portraitProcessed.style.display !== "none" &&
-        portraitProcessed.complete &&
-        portraitProcessed.naturalWidth > 0
-      ) {
-        const x = parseFloat(portraitStyle.left) / 100 * rect.width * scale;
-        const y = parseFloat(portraitStyle.top) / 100 * rect.height * scale;
-        const w = parseFloat(portraitStyle.width) / 100 * rect.width * scale;
-        const h = parseFloat(portraitStyle.height) / 100 * rect.height * scale;
-
-        ctx.save();
-        ctx.beginPath();
-        ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, Math.PI * 2);
-        ctx.clip();
-        ctx.drawImage(portraitProcessed, x, y, w, h);
-        ctx.restore();
-      }
-
-      const messageStyle = getComputedStyle(messageText);
-      const mx = parseFloat(messageStyle.left) / 100 * rect.width * scale;
-      const my = parseFloat(messageStyle.top) / 100 * rect.height * scale;
-      const mw = parseFloat(messageStyle.width) / rect.width * canvas.width;
-      const mh = parseFloat(messageStyle.height) / rect.height * canvas.height;
-
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(mx, my, mw, mh);
-      ctx.clip();
-
-      ctx.fillStyle = messageStyle.color;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-
-      const fontSize = parseFloat(messageStyle.fontSize) * scale;
-      ctx.font = `${fontSize}px serif`;
-
-      const lines = messageText.innerText.split("\n");
-      const lineHeight = fontSize * 1.2;
-      const totalHeight = lines.length * lineHeight;
-      let ty = my + mh / 2 - totalHeight / 2 + lineHeight / 2;
-
-      for (const line of lines) {
-        ctx.fillText(line, mx + mw / 2, ty, mw * 0.94);
-        ty += lineHeight;
-      }
-
-      ctx.restore();
-      dataUrl = canvas.toDataURL("image/png");
+  dataUrl = canvas.toDataURL("image/png");
     } else {
       dataUrl = await htmlToImage.toPng(banknote, {
         pixelRatio: 2,
